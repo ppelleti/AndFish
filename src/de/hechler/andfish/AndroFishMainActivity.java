@@ -4,39 +4,20 @@
  * This file is part of AndroFish
  *
  * AndroFish is free software;
- * you can redistribute it and/or modify it under the terms of the GNU
- * General Public License as published by the Free Software Foundation;
- * either version 2 of the License, or (at your option) any later version.
- * 
- * AndroFish is distributed
- * in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with the AndroFish;
- * if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
  *******************************************************************************/
 package de.hechler.andfish;
 
-import com.andoop.highscore.api.HighScoreManager;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
 
 /**
  * This class provides a basic demonstration of how to write an Android
@@ -48,7 +29,6 @@ public class AndroFishMainActivity extends Activity {
 	public static final String INTENT_EXTRA_LEVEL_NAME = "de.hechler.androfish.extra.LEVEL";
 	public static final String INTENT_EXTRA_PLAY_MUSIC = "de.hechler.androfish.extra.PLAY_MUSIC";
 	public static final String INTENT_EXTRA_PLAY_SOUND = "de.hechler.androfish.extra.PLAY_SOUND";
-	public static final String INTENT_EXTRA_ONLINE_HIGHSCORE_INSTALLED = "de.hechler.androfish.extra.ONLINE_HIGHSCORE_INSTALLED";
 
 	public final static boolean DEFAULT_PLAY_MUSIC_VALUE = true;
 	public final static boolean DEFAULT_PLAY_SOUND_VALUE = true;
@@ -62,11 +42,8 @@ public class AndroFishMainActivity extends Activity {
 	CheckBox cbPlaySound;
 	Button   btStart;
 	Button   btHighscore;
-	Button   btOnlineHighscore;
 	Button   btHelp;
 	Button   btExit;
-	
-	private boolean  mOnlineHighscoreInstalled;
 	
 	SimplePersistence persist; 
 	public final static String PREFS_NAME = "AndroFishPrefs";
@@ -88,22 +65,9 @@ public class AndroFishMainActivity extends Activity {
         // find buttons in view
         btStart = ((Button) findViewById(R.id.btStart));
         btHighscore = ((Button) findViewById(R.id.btHighscore));
-        btOnlineHighscore = ((Button) findViewById(R.id.btOnlineHighscore));
         btHelp = ((Button) findViewById(R.id.btHelp));
         btExit = ((Button) findViewById(R.id.btExit));
 
-        checkOnlineHighscoreInstalled();
-        if (mOnlineHighscoreInstalled) {
-        	btHighscore.setVisibility(View.INVISIBLE);
-        	btOnlineHighscore.setText("Online Highscore");
-        	LinearLayout layout = (LinearLayout)btHighscore.getParent();
-        	layout.removeView(btHighscore);
-        }
-        else {
-        	btHighscore.setVisibility(View.VISIBLE);
-        	btOnlineHighscore.setText("Install Online Highscore");
-        }
-        
         // load persisted values
         persist = new SimplePersistence(this, PREFS_NAME);
     	boolean playMusic = persist.getBoolean(PREFS_PLAY_MUSIC, DEFAULT_PLAY_MUSIC_VALUE);
@@ -114,7 +78,6 @@ public class AndroFishMainActivity extends Activity {
         // set actions for buttons
         btStart.setOnClickListener(StartListener);
         btHighscore.setOnClickListener(HighscoreListener);
-        btOnlineHighscore.setOnClickListener(OnlineHighscoreListener);
         btHelp.setOnClickListener(HelpListener);
         btExit.setOnClickListener(ExitListener);
     }
@@ -124,20 +87,8 @@ public class AndroFishMainActivity extends Activity {
     protected void onRestart() {
     	// TODO Auto-generated method stub
     	super.onRestart();
-    	checkOnlineHighscoreInstalled();
     }
     
-    private void checkOnlineHighscoreInstalled() {
-    	PackageManager pm = getPackageManager();
-    	try {
-			pm.getApplicationInfo("com.andoop.highscore", 0);
-			mOnlineHighscoreInstalled = true;
-		} catch (NameNotFoundException e) {
-			mOnlineHighscoreInstalled = false;
-		}
-	}
-
-
 	@Override
     protected void onStop() {
     	super.onStop();
@@ -169,12 +120,6 @@ public class AndroFishMainActivity extends Activity {
     OnClickListener StartListener = new OnClickListener() {
         public void onClick(View v) {
             showDialog(START_LEVELSET_SELECTION);
-        }
-    };
-    OnClickListener OnlineHighscoreListener = new OnClickListener() {
-        public void onClick(View v) {
-        	HighScoreManager _scoreManager = new HighScoreManager(AndroFishMainActivity.this);
-        	_scoreManager.showBoard();
         }
     };
 	
@@ -218,7 +163,6 @@ public class AndroFishMainActivity extends Activity {
             	    	intent.putExtra(INTENT_EXTRA_LEVEL_NAME, levelName);
             	    	intent.putExtra(INTENT_EXTRA_PLAY_MUSIC, cbPlayMusic.isChecked());
             	    	intent.putExtra(INTENT_EXTRA_PLAY_SOUND, cbPlaySound.isChecked());
-            	    	intent.putExtra(INTENT_EXTRA_ONLINE_HIGHSCORE_INSTALLED, mOnlineHighscoreInstalled);
             	    	startActivity(intent);
                     }
                 })

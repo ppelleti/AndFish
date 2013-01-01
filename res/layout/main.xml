@@ -52,11 +52,6 @@
   				android:layout_height="wrap_content" 
   				android:textSize="16px" 
   				android:text="Highscore"/>
-	<Button android:id="@+id/btOnlineHighscore"        
-  				android:layout_width="120px" 
-  				android:layout_height="wrap_content" 
-  				android:textSize="16px" 
-  				android:text="Install Online Highscore"/>
 	<Button android:id="@+id/btHelp"        
   				android:layout_width="120px" 
   				android:layout_height="wrap_content" 

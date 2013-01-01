@@ -1,3 +1,7 @@
+v1.3:
+-------
+removed online highscore, because it is no longer supported.
+
 v1.2:
 -------
 follow movement of touch-events.

@@ -6,8 +6,6 @@ import java.util.Random;
 
 import org.json.JSONException;
 
-import com.andoop.highscore.api.HighScoreManager;
-
 import de.hechler.andfish.Highscore.Entry;
 
 import android.app.Activity;
@@ -259,7 +257,6 @@ public class AndroidFishEatingFish extends Activity {
     private String mLevelName = "";
     private boolean mPlayMusic;
     private boolean mPlaySound;
-    private boolean mOnlineHighscoreInstalled;
     
     private SimplePersistence persist;
     public Highscore highscore;
@@ -270,16 +267,6 @@ public class AndroidFishEatingFish extends Activity {
     private int mPlayList = 0;
     private int[] mSongs = {R.raw.sdbounce1, R.raw.forgan1};
     
-	private HighScoreManager _scoreManager;
-
-	
-	private boolean submitScore(int newScoreInt, String newScoreDisplay, String subBoard) {
-		if (_scoreManager == null) {
-			return false;
-		}
-		_scoreManager.submitScore(newScoreInt, newScoreDisplay, subBoard);
-		return true;
-	}
     
     /** Called when the activity is first created. */
     @Override
@@ -292,7 +279,6 @@ public class AndroidFishEatingFish extends Activity {
 		mLevelName = getIntent().getStringExtra(AndroFishMainActivity.INTENT_EXTRA_LEVEL_NAME);
 		mPlayMusic = getIntent().getBooleanExtra(AndroFishMainActivity.INTENT_EXTRA_PLAY_MUSIC, AndroFishMainActivity.DEFAULT_PLAY_MUSIC_VALUE);
 		mPlaySound = getIntent().getBooleanExtra(AndroFishMainActivity.INTENT_EXTRA_PLAY_SOUND, AndroFishMainActivity.DEFAULT_PLAY_SOUND_VALUE);
-		mOnlineHighscoreInstalled = getIntent().getBooleanExtra(AndroFishMainActivity.INTENT_EXTRA_ONLINE_HIGHSCORE_INSTALLED, AndroFishMainActivity.DEFAULT_ONLINE_HIGHSCORE_INSTALLED_VALUE);
 		if (mLevelName == null)
 			mLevelName = "easy";
         initBitmaps();
@@ -301,12 +287,7 @@ public class AndroidFishEatingFish extends Activity {
         setContentView(mGraphView);
 		mGraphView.runProgram();
 		soundHandler.startMusic();
-		if (!mOnlineHighscoreInstalled) {
-			readScores();
-		}
-		else {
-			_scoreManager = new HighScoreManager(this);
-		}
+		readScores();
     }
     
 	@Override
@@ -1095,11 +1076,9 @@ public class AndroidFishEatingFish extends Activity {
 				paint.setTextSize(28.0f);
 				paint.setTextAlign(Align.CENTER);
 				paint.setColor(0xFFFF4040);
-				if (!mOnlineHighscoreInstalled) {
-					if (mHSPosition != -1) {
-						canvas.drawText("Congratulations "+mLastName+"!", maxWidth/2, 120, paint);
-						canvas.drawText("Highscore Rank "+(mHSPosition+1)+"", maxWidth/2, 160, paint);
-					}
+				if (mHSPosition != -1) {
+					canvas.drawText("Congratulations "+mLastName+"!", maxWidth/2, 120, paint);
+					canvas.drawText("Highscore Rank "+(mHSPosition+1)+"", maxWidth/2, 160, paint);
 				}
 				canvas.drawText("GAME OVER", maxWidth/2, 200, paint);
 				canvas.drawText("Level: "+mLevel, maxWidth/2, 240, paint);
@@ -1139,28 +1118,20 @@ public class AndroidFishEatingFish extends Activity {
 	    		return false;
 	    	}
 			mMode = MODE_GAMEOVER;
-			if (!mOnlineHighscoreInstalled) {
-				String infoText; 
-				mHSPosition = highscore.insertEntry(mLastName, mLevel, mScore);
-				if (mHSPosition != -1) {
-					writeScores();
-					infoText = "Congratulations!!! Position: "+(mHSPosition+1)+" , Level: "+ mLevelName+", Score: "+mScore+"";
-				}
-				else {
-					infoText = mLevelName + ": Level: "+ mLevel + ", Score: "+mScore;;
-				}
-				if (mHSPosition >= 0)
-					enterName();
-
-				mGraphView.invalidate();
-		        Toast.makeText(AndroidFishEatingFish.this, infoText, Toast.LENGTH_LONG).show();
+			String infoText; 
+			mHSPosition = highscore.insertEntry(mLastName, mLevel, mScore);
+			if (mHSPosition != -1) {
+				writeScores();
+				infoText = "Congratulations!!! Position: "+(mHSPosition+1)+" , Level: "+ mLevelName+", Score: "+mScore+"";
 			}
 			else {
-				submitScore(mScore, "(Level-"+mLevel+") "+mScore, mLevelName);
-				String infoText = mLevelName + ": Level: "+ mLevel + ", Score: "+mScore;;
-				mGraphView.invalidate();
-		        Toast.makeText(AndroidFishEatingFish.this, infoText, Toast.LENGTH_LONG).show();
+				infoText = mLevelName + ": Level: "+ mLevel + ", Score: "+mScore;;
 			}
+			if (mHSPosition >= 0)
+				enterName();
+
+			mGraphView.invalidate();
+	        Toast.makeText(AndroidFishEatingFish.this, infoText, Toast.LENGTH_LONG).show();
 			return true;
 		}
 
