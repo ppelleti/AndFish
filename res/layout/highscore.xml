@@ -10,7 +10,7 @@
 			android:orientation="horizontal" 
 			android:baselineAligned="true">
     	<TextView 
-    			android:layout_width="50px" 
+    			android:layout_width="50dp"
     			android:layout_height="wrap_content" 
     			android:text="" />
 		<LinearLayout 
@@ -239,9 +239,9 @@
 			android:gravity="center_horizontal"
 			android:baselineAligned="true">
 		<Button android:id="@+id/btOk"        
-   				android:layout_width="60px" 
+   				android:layout_width="60dp"
    				android:layout_height="wrap_content" 
-   				android:textSize="10px" 
+   				android:textSize="10dp"
    				android:text="OK">
       	<requestFocus />
       </Button>
