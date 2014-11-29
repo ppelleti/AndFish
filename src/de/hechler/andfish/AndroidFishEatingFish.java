@@ -1068,7 +1068,7 @@ public class AndroidFishEatingFish extends Activity {
 				paint.setTextAlign(Align.CENTER);
 				paint.setColor(0xFFFF4040);
 				canvas.drawText("* PAUSED *", maxWidth/2, 160 * df, paint);
-				paint.setTextSize(20.0f);
+				paint.setTextSize(20.0f * df);
 				canvas.drawText("Touch screen to continue", maxWidth/2, 200 * df, paint);
 				canvas.drawText("Press back twice to exit", maxWidth/2, 230 * df, paint);
 				return;
