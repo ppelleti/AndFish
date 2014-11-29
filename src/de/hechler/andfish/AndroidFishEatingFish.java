@@ -1061,42 +1061,43 @@ public class AndroidFishEatingFish extends Activity {
 		}
 		
 		private void drawFood(Canvas canvas, Paint paint) {
+                        final float df = mDensityFactor;
 			paint.setTypeface(Typeface.DEFAULT_BOLD);
 			if (mMode == MODE_PAUSE) {
-				paint.setTextSize(28.0f);
+				paint.setTextSize(28.0f * df);
 				paint.setTextAlign(Align.CENTER);
 				paint.setColor(0xFFFF4040);
-				canvas.drawText("* PAUSED *", maxWidth/2, 160, paint);
-				paint.setTextSize(20.0f);
-				canvas.drawText("Touch screen to continue", maxWidth/2, 200, paint);
-				canvas.drawText("Press back twice to exit", maxWidth/2, 230, paint);
+				canvas.drawText("* PAUSED *", maxWidth/2, 160 * df, paint);
+				paint.setTextSize(20.0f * df);
+				canvas.drawText("Touch screen to continue", maxWidth/2, 200 * df, paint);
+				canvas.drawText("Press back twice to exit", maxWidth/2, 230 * df, paint);
 				return;
 			}
 			if (mMode == MODE_GAMEOVER) {
-				paint.setTextSize(28.0f);
+				paint.setTextSize(28.0f * df);
 				paint.setTextAlign(Align.CENTER);
 				paint.setColor(0xFFFF4040);
 				if (mHSPosition != -1) {
-					canvas.drawText("Congratulations "+mLastName+"!", maxWidth/2, 120, paint);
-					canvas.drawText("Highscore Rank "+(mHSPosition+1)+"", maxWidth/2, 160, paint);
+					canvas.drawText("Congratulations "+mLastName+"!", maxWidth/2, 120 * df, paint);
+					canvas.drawText("Highscore Rank "+(mHSPosition+1)+"", maxWidth/2, 160 * df, paint);
 				}
-				canvas.drawText("GAME OVER", maxWidth/2, 200, paint);
-				canvas.drawText("Level: "+mLevel, maxWidth/2, 240, paint);
-				canvas.drawText("Score: "+mScore, maxWidth/2, 280, paint);
+				canvas.drawText("GAME OVER", maxWidth/2, 200 * df, paint);
+				canvas.drawText("Level: "+mLevel, maxWidth/2, 240 * df, paint);
+				canvas.drawText("Score: "+mScore, maxWidth/2, 280 * df, paint);
 				
 				return;
 			}
 			int w = (int)(60f*mDensityFactor);
 			int h = (int)(18f*mDensityFactor);
 			int left = maxWidth-10-w;
-			paint.setTextSize(14.0f);
+			paint.setTextSize(14.0f * df);
 			paint.setTextAlign(Align.LEFT);
-			canvas.drawText("Level: "+mLevel, left, 20, paint);
-			canvas.drawText("Score: "+mScore, left, 40, paint);
+			canvas.drawText("Level: "+mLevel, left, 20 * df, paint);
+			canvas.drawText("Score: "+mScore, left, 40 * df, paint);
 			int percent = w*mFood/MAX_FOOD;
-			canvas.drawBitmap(mIndicator[0], left, 50, paint);
+			canvas.drawBitmap(mIndicator[0], left, 50 * df, paint);
 			Rect src = new Rect(0,0,percent,h);
-			Rect dest= new Rect(left +0, 50 +0, left +percent, 50 +h);
+			Rect dest= new Rect(left +0, (int) (50 * df +0), left +percent, (int) (50 * df +h));
 			canvas.drawBitmap(mIndicator[1], src, dest, paint);
 		}
 		
