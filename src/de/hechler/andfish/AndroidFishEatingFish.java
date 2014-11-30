@@ -1091,6 +1091,10 @@ public class AndroidFishEatingFish extends Activity {
 			int h = (int)(18f*mDensityFactor);
 			int left = maxWidth-10-w;
 			paint.setTextSize(14.0f * df);
+                        final String meastxt = "Score: 99999";
+                        Rect txtbound = new Rect();
+                        paint.getTextBounds (meastxt, 0, meastxt.length(), txtbound);
+                        left = Math.min(left, maxWidth - txtbound.right);
 			paint.setTextAlign(Align.LEFT);
 			canvas.drawText("Level: "+mLevel, left, 20 * df, paint);
 			canvas.drawText("Score: "+mScore, left, 40 * df, paint);
