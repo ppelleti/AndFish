@@ -490,7 +490,35 @@ public class AndroidFishEatingFish extends Activity {
         }
 
 
-		public void pauseGame() {
+        @Override
+        public Parcelable onSaveInstanceState() {
+            Bundle b = new Bundle();
+            b.putBundle("playerFish", playerFish.onSaveInstanceState());
+            ArrayList<Parcelable> fishParcels = new ArrayList<Parcelable>;
+            for (Fish fish : computerFishs)
+                fishParcels.add(fish.onSaveInstanceState());
+            b.putParcelableArray("computerFishs", fishParcels);
+            ArrayList<Parcelable> goodieParcels = new ArrayList<Parcelable>;
+            for (Goodie goodie : goodies)
+                goodieParcels.add(goodie.onSaveInstanceState());
+            b.putParcelableArray("goodies", goodieParcels);
+            b.putInteger("mMode", mMode);
+            b.putInteger("oldMode", oldMode);
+            b.putInteger("mState", mState);
+            b.putInteger("mSpeed", mSpeed);
+            b.putInteger("mCount", mCount);
+            b.putInteger("mAnimCount", mAnimCount);
+            b.putInteger("mFood", mFood);
+            b.putInteger("mLevel", mLevel);
+            b.putFloat("mSpeedFactor", mSpeedFactor);
+            b.PutFloat("mLevelSpeed", mLevelSpeed);
+            b.putInteger("mScore", mScore);
+            b.putInteger("mActiveGoodie", mActiveGoodie);
+            b.putInteger("mActiveGoodieTime", mActiveGoodieTime);
+        }
+
+
+        public void pauseGame() {
 			if (mMode != MODE_PAUSE) {
 		        mOldMode = mMode; 
 		        mMode = MODE_PAUSE;
