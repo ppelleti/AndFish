@@ -29,6 +29,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -81,6 +82,25 @@ public class AndroidFishEatingFish extends Activity {
     		this.size  = size;
     		this.animStart = animStart;
     	}
+
+        VisibleObject(Bundle b) {
+            posX = b.getInt("posX");
+            posY = b.getInt("posY");
+            dir = b.getInt("dir");
+            size = b.getInt("size");
+            animStart = b.getInt("animStart");
+        }
+
+        Bundle onSaveInstanceState() {
+            Bundle b = new Bundle(6);
+            b.putInt("posX", posX);
+            b.putInt("posY", posY);
+            b.putInt("dir", dir);
+            b.putInt("size", size);
+            b.putInt("animStart", animStart);
+            return b;
+        }
+
     	int posX;
     	int posY;
     	int dir;
@@ -92,6 +112,10 @@ public class AndroidFishEatingFish extends Activity {
     	Fish(int posX, int posY, int dir, int size, int animStart) {
     		super(posX, posY, dir, size, animStart);
     	}
+
+        Fish(Bundle b) {
+            super(b);
+        }
     }
 
     
@@ -104,6 +128,18 @@ public class AndroidFishEatingFish extends Activity {
     		super(posX, posY, DIR_RIGHT, SIZE_3, animStart);
     		this.goodietype = goodietype;
     	}
+
+        Goodie(Bundle b) {
+            super(b);
+            goodietype = b.getInt("goodietype");
+        }
+
+        Bundle onSaveInstanceState() {
+            Bundle b = super.onSaveInstanceState();
+            b.putInt("goodietype", goodietype);
+            return b;
+        }
+
     	int goodietype;
     }
 
@@ -275,18 +311,39 @@ public class AndroidFishEatingFish extends Activity {
         
         // thread for handling sound
         soundHandler = new SoundHandler();
-        
-		mLevelName = getIntent().getStringExtra(AndroFishMainActivity.INTENT_EXTRA_LEVEL_NAME);
-		mPlayMusic = getIntent().getBooleanExtra(AndroFishMainActivity.INTENT_EXTRA_PLAY_MUSIC, AndroFishMainActivity.DEFAULT_PLAY_MUSIC_VALUE);
-		mPlaySound = getIntent().getBooleanExtra(AndroFishMainActivity.INTENT_EXTRA_PLAY_SOUND, AndroFishMainActivity.DEFAULT_PLAY_SOUND_VALUE);
+
+        if (savedInstanceState != null &&
+            savedInstanceState.containsKey("mShowFrames")) {
+            mShowFrames = savedInstanceState.getBoolean("mShowFrames");
+            mLevelName = savedInstanceState.getString("mLevelName");
+            mPlayMusic = savedInstanceState.getBoolean("mPlayMusic");
+            mPlaySound = savedInstanceState.getBoolean("mPlaySound");
+            mPlayList = savedInstanceState.getInt("mPlayList");
+        } else {
+            mLevelName = getIntent().getStringExtra(AndroFishMainActivity.INTENT_EXTRA_LEVEL_NAME);
+            mPlayMusic = getIntent().getBooleanExtra(AndroFishMainActivity.INTENT_EXTRA_PLAY_MUSIC, AndroFishMainActivity.DEFAULT_PLAY_MUSIC_VALUE);
+            mPlaySound = getIntent().getBooleanExtra(AndroFishMainActivity.INTENT_EXTRA_PLAY_SOUND, AndroFishMainActivity.DEFAULT_PLAY_SOUND_VALUE);
+        }
 		if (mLevelName == null)
 			mLevelName = "easy";
         initBitmaps();
         mGraphView = new GraphView(this);
+        mGraphView.setId(123456789);
+        mGraphView.setSaveEnabled(true);
 		mGraphView.setLevel(mLevelName);
         setContentView(mGraphView);
 		mGraphView.runProgram();
 		readScores();
+    }
+
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("mShowFrames", mShowFrames);
+        outState.putString("mLevelName", mLevelName);
+        outState.putBoolean("mPlayMusic", mPlayMusic);
+        outState.putBoolean("mPlaySound", mPlaySound);
+        outState.putInt("mPlayList", mPlayList);
     }
 
 	@Override
@@ -496,7 +553,72 @@ public class AndroidFishEatingFish extends Activity {
         }
 
 
-		public void pauseGame() {
+        @Override
+        public Parcelable onSaveInstanceState() {
+            Bundle b = new Bundle(17);
+            b.putParcelable("superState", super.onSaveInstanceState());
+            b.putBundle("playerFish", playerFish.onSaveInstanceState());
+            ArrayList<Parcelable> fishParcels =
+                new ArrayList<Parcelable>(computerFishs.size());
+            for (Fish fish : computerFishs)
+                fishParcels.add(fish.onSaveInstanceState());
+            b.putParcelableArrayList("computerFishs", fishParcels);
+            ArrayList<Parcelable> goodieParcels =
+                new ArrayList<Parcelable>(goodies.size());
+            for (Goodie goodie : goodies)
+                goodieParcels.add(goodie.onSaveInstanceState());
+            b.putParcelableArrayList("goodies", goodieParcels);
+            b.putInt("mMode", mMode);
+            b.putInt("mOldMode", mOldMode);
+            b.putInt("mState", mState);
+            b.putInt("mSpeed", mSpeed);
+            b.putInt("mCount", mCount);
+            b.putInt("mAnimCount", mAnimCount);
+            b.putInt("mFood", mFood);
+            b.putInt("mLevel", mLevel);
+            b.putFloat("mSpeedFactor", mSpeedFactor);
+            b.putFloat("mLevelSpeed", mLevelSpeed);
+            b.putInt("mScore", mScore);
+            b.putInt("mActiveGoodie", mActiveGoodie);
+            b.putInt("mActiveGoodieTime", mActiveGoodieTime);
+            return b;
+        }
+
+        @Override
+        public void onRestoreInstanceState(Parcelable p) {
+            Bundle b = (Bundle) p;
+
+            super.onRestoreInstanceState(b.getParcelable("superState"));
+
+            playerFish = new Fish(b.getBundle("playerFish"));
+
+            ArrayList<Parcelable> fishParcels = b.getParcelableArrayList("computerFishs");
+            computerFishs.clear();
+            for (Parcelable fish : fishParcels)
+                computerFishs.add(new Fish((Bundle)fish));
+
+            ArrayList<Parcelable> goodieParcels = b.getParcelableArrayList("goodies");
+            goodies.clear();
+            for (Parcelable goodie : goodieParcels)
+                goodies.add(new Goodie((Bundle)goodie));
+
+            mMode = b.getInt("mMode");
+            mOldMode = b.getInt("mOldMode");
+            mState = b.getInt("mState");
+            mSpeed = b.getInt("mSpeed");
+            mCount = b.getInt("mCount");
+            mAnimCount = b.getInt("mAnimCount");
+            mFood = b.getInt("mFood");
+            mLevel = b.getInt("mLevel");
+            mSpeedFactor = b.getFloat("mSpeedFactor");
+            mLevelSpeed = b.getFloat("mLevelSpeed");
+            mScore = b.getInt("mScore");
+            mActiveGoodie = b.getInt("mActiveGoodie");
+            mActiveGoodieTime = b.getInt("mActiveGoodieTime");
+        }
+
+
+        public void pauseGame() {
 			if (mMode != MODE_PAUSE) {
 		        mOldMode = mMode; 
 		        mMode = MODE_PAUSE;
