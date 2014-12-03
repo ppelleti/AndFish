@@ -286,16 +286,22 @@ public class AndroidFishEatingFish extends Activity {
 		mGraphView.setLevel(mLevelName);
         setContentView(mGraphView);
 		mGraphView.runProgram();
-		soundHandler.startMusic();
 		readScores();
     }
-    
+
 	@Override
-	protected void onStop() {
-		super.onStop();
+	protected void onResume() {
+		super.onResume();
+        soundHandler.startMusic();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+        mGraphView.pauseGame();
 		stopMusic();
 	}
-	
+
 	private OnCompletionListener completionListener = new MediaPlayer.OnCompletionListener() {
 		@Override
 		public void onCompletion(MediaPlayer mp) {
