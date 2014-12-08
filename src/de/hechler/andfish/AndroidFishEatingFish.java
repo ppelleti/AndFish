@@ -29,6 +29,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -86,6 +87,15 @@ public class AndroidFishEatingFish extends Activity {
     	int dir;
     	int size;
     	int animStart;
+        Bundle onSaveInstanceState() {
+            Bundle b = new Bundle(6);
+            b.putInt("posX", posX);
+            b.putInt("posY", posY);
+            b.putInt("dir", dir);
+            b.putInt("size", size);
+            b.putInt("animStart", animStart);
+            return b;
+        }
     }
 
     static class Fish extends VisibleObject{
@@ -105,6 +115,11 @@ public class AndroidFishEatingFish extends Activity {
     		this.goodietype = goodietype;
     	}
     	int goodietype;
+        Bundle onSaveInstanceState() {
+            Bundle b = super.onSaveInstanceState();
+            b.putInt("goodietype", goodietype);
+            return b;
+        }
     }
 
     private Bitmap[] mBackground;
@@ -287,6 +302,16 @@ public class AndroidFishEatingFish extends Activity {
         setContentView(mGraphView);
 		mGraphView.runProgram();
 		readScores();
+    }
+
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("mShowFrames", mShowFrames);
+        outState.putString("mLevelName", mLevelName);
+        outState.putBoolean("mPlayMusic", mPlayMusic);
+        outState.putBoolean("mPlaySound", mPlaySound);
+        outState.putInt("mPlayList", mPlayList);
     }
 
 	@Override
@@ -508,29 +533,32 @@ public class AndroidFishEatingFish extends Activity {
 
         @Override
         public Parcelable onSaveInstanceState() {
-            Bundle b = new Bundle();
+            Bundle b = new Bundle(16);
             b.putBundle("playerFish", playerFish.onSaveInstanceState());
-            ArrayList<Parcelable> fishParcels = new ArrayList<Parcelable>;
+            ArrayList<Parcelable> fishParcels =
+                new ArrayList<Parcelable>(computerFishs.size());
             for (Fish fish : computerFishs)
                 fishParcels.add(fish.onSaveInstanceState());
-            b.putParcelableArray("computerFishs", fishParcels);
-            ArrayList<Parcelable> goodieParcels = new ArrayList<Parcelable>;
+            b.putParcelableArrayList("computerFishs", fishParcels);
+            ArrayList<Parcelable> goodieParcels =
+                new ArrayList<Parcelable>(goodies.size());
             for (Goodie goodie : goodies)
                 goodieParcels.add(goodie.onSaveInstanceState());
-            b.putParcelableArray("goodies", goodieParcels);
-            b.putInteger("mMode", mMode);
-            b.putInteger("oldMode", oldMode);
-            b.putInteger("mState", mState);
-            b.putInteger("mSpeed", mSpeed);
-            b.putInteger("mCount", mCount);
-            b.putInteger("mAnimCount", mAnimCount);
-            b.putInteger("mFood", mFood);
-            b.putInteger("mLevel", mLevel);
+            b.putParcelableArrayList("goodies", goodieParcels);
+            b.putInt("mMode", mMode);
+            b.putInt("mOldMode", mOldMode);
+            b.putInt("mState", mState);
+            b.putInt("mSpeed", mSpeed);
+            b.putInt("mCount", mCount);
+            b.putInt("mAnimCount", mAnimCount);
+            b.putInt("mFood", mFood);
+            b.putInt("mLevel", mLevel);
             b.putFloat("mSpeedFactor", mSpeedFactor);
-            b.PutFloat("mLevelSpeed", mLevelSpeed);
-            b.putInteger("mScore", mScore);
-            b.putInteger("mActiveGoodie", mActiveGoodie);
-            b.putInteger("mActiveGoodieTime", mActiveGoodieTime);
+            b.putFloat("mLevelSpeed", mLevelSpeed);
+            b.putInt("mScore", mScore);
+            b.putInt("mActiveGoodie", mActiveGoodie);
+            b.putInt("mActiveGoodieTime", mActiveGoodieTime);
+            return b;
         }
 
 
