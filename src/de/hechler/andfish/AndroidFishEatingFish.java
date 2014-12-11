@@ -1241,6 +1241,7 @@ public class AndroidFishEatingFish extends Activity {
 			Rect src = new Rect(0,0,percent,h);
 			Rect dest= new Rect(left +0, (int) (50 * df +0), left +percent, (int) (50 * df +h));
 			canvas.drawBitmap(mIndicator[1], src, dest, paint);
+            canvas.drawText("Mem: " + Runtime.getRuntime().totalMemory() / 1024 / 1024 + "M", 20 * df, 20 * df, paint);
 		}
 		
 		
