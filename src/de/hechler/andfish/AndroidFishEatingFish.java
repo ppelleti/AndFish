@@ -82,11 +82,15 @@ public class AndroidFishEatingFish extends Activity {
     		this.size  = size;
     		this.animStart = animStart;
     	}
-    	int posX;
-    	int posY;
-    	int dir;
-    	int size;
-    	int animStart;
+
+        VisibleObject(Bundle b) {
+            posX = b.getInt("posX");
+            posY = b.getInt("posY");
+            dir = b.getInt("dir");
+            size = b.getInt("size");
+            animStart = b.getInt("animStart");
+        }
+
         Bundle onSaveInstanceState() {
             Bundle b = new Bundle(6);
             b.putInt("posX", posX);
@@ -96,12 +100,22 @@ public class AndroidFishEatingFish extends Activity {
             b.putInt("animStart", animStart);
             return b;
         }
+
+    	int posX;
+    	int posY;
+    	int dir;
+    	int size;
+    	int animStart;
     }
 
     static class Fish extends VisibleObject{
     	Fish(int posX, int posY, int dir, int size, int animStart) {
     		super(posX, posY, dir, size, animStart);
     	}
+
+        Fish(Bundle b) {
+            super(b);
+        }
     }
 
     
@@ -114,12 +128,19 @@ public class AndroidFishEatingFish extends Activity {
     		super(posX, posY, DIR_RIGHT, SIZE_3, animStart);
     		this.goodietype = goodietype;
     	}
-    	int goodietype;
+
+        Goodie(Bundle b) {
+            super(b);
+            goodietype = b.getInt("goodietype");
+        }
+
         Bundle onSaveInstanceState() {
             Bundle b = super.onSaveInstanceState();
             b.putInt("goodietype", goodietype);
             return b;
         }
+
+    	int goodietype;
     }
 
     private Bitmap[] mBackground;
@@ -290,14 +311,25 @@ public class AndroidFishEatingFish extends Activity {
         
         // thread for handling sound
         soundHandler = new SoundHandler();
-        
-		mLevelName = getIntent().getStringExtra(AndroFishMainActivity.INTENT_EXTRA_LEVEL_NAME);
-		mPlayMusic = getIntent().getBooleanExtra(AndroFishMainActivity.INTENT_EXTRA_PLAY_MUSIC, AndroFishMainActivity.DEFAULT_PLAY_MUSIC_VALUE);
-		mPlaySound = getIntent().getBooleanExtra(AndroFishMainActivity.INTENT_EXTRA_PLAY_SOUND, AndroFishMainActivity.DEFAULT_PLAY_SOUND_VALUE);
+
+        if (savedInstanceState != null &&
+            savedInstanceState.containsKey("mShowFrames")) {
+            mShowFrames = savedInstanceState.getBoolean("mShowFrames");
+            mLevelName = savedInstanceState.getString("mLevelName");
+            mPlayMusic = savedInstanceState.getBoolean("mPlayMusic");
+            mPlaySound = savedInstanceState.getBoolean("mPlaySound");
+            mPlayList = savedInstanceState.getInt("mPlayList");
+        } else {
+            mLevelName = getIntent().getStringExtra(AndroFishMainActivity.INTENT_EXTRA_LEVEL_NAME);
+            mPlayMusic = getIntent().getBooleanExtra(AndroFishMainActivity.INTENT_EXTRA_PLAY_MUSIC, AndroFishMainActivity.DEFAULT_PLAY_MUSIC_VALUE);
+            mPlaySound = getIntent().getBooleanExtra(AndroFishMainActivity.INTENT_EXTRA_PLAY_SOUND, AndroFishMainActivity.DEFAULT_PLAY_SOUND_VALUE);
+        }
 		if (mLevelName == null)
 			mLevelName = "easy";
         initBitmaps();
         mGraphView = new GraphView(this);
+        mGraphView.setId(123456789);
+        mGraphView.setSaveEnabled(true);
 		mGraphView.setLevel(mLevelName);
         setContentView(mGraphView);
 		mGraphView.runProgram();
@@ -559,6 +591,36 @@ public class AndroidFishEatingFish extends Activity {
             b.putInt("mActiveGoodie", mActiveGoodie);
             b.putInt("mActiveGoodieTime", mActiveGoodieTime);
             return b;
+        }
+
+        @Override
+        public void onRestoreInstanceState(Parcelable p) {
+            Bundle b = (Bundle) p;
+            playerFish = new Fish(b.getBundle("playerFish"));
+
+            ArrayList<Parcelable> fishParcels = b.getParcelableArrayList("computerFishs");
+            computerFishs.clear();
+            for (Parcelable fish : fishParcels)
+                computerFishs.add(new Fish((Bundle)fish));
+
+            ArrayList<Parcelable> goodieParcels = b.getParcelableArrayList("goodies");
+            goodies.clear();
+            for (Parcelable goodie : goodieParcels)
+                goodies.add(new Goodie((Bundle)goodie));
+
+            mMode = b.getInt("mMode");
+            mOldMode = b.getInt("mOldMode");
+            mState = b.getInt("mState");
+            mSpeed = b.getInt("mSpeed");
+            mCount = b.getInt("mCount");
+            mAnimCount = b.getInt("mAnimCount");
+            mFood = b.getInt("mFood");
+            mLevel = b.getInt("mLevel");
+            mSpeedFactor = b.getFloat("mSpeedFactor");
+            mLevelSpeed = b.getFloat("mLevelSpeed");
+            mScore = b.getInt("mScore");
+            mActiveGoodie = b.getInt("mActiveGoodie");
+            mActiveGoodieTime = b.getInt("mActiveGoodieTime");
         }
 
 
