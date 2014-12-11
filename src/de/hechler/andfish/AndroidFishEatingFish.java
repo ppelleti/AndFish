@@ -247,6 +247,25 @@ public class AndroidFishEatingFish extends Activity {
     	}
     }
 
+    private void recycleBitmaps() {
+        recycleBitmapResources(mBackground);
+        recycleBitmapResources(mComputerFish);
+        recycleBitmapResources(mPlayerFish);
+        recycleBitmapResources(mFishbone);
+        recycleBitmapResources(mIndicator);
+        recycleBitmapResources(mTargetMarker);
+        recycleBitmapResources(mMouth);
+        recycleBitmapResources(mBubble);
+        mBackground   = null;
+        mComputerFish = null;
+        mPlayerFish   = null;
+        mFishbone     = null;
+        mIndicator    = null;
+        mTargetMarker = null;
+        mMouth        = null;
+        mBubble       = null;
+   }
+
 	private Bitmap[] loadBitmapResources(int[] resIDs) {
 		Bitmap[] result = new Bitmap[resIDs.length];
 		for (int i=0;i<resIDs.length;i++) {
@@ -254,6 +273,11 @@ public class AndroidFishEatingFish extends Activity {
 		}
 		return result;
 	}
+
+    private void recycleBitmapResources(Bitmap[] bmaps) {
+        for (Bitmap b : bmaps)
+            b.recycle();
+    }
 
 	private final static int MSG_PLAY_SOUND = 1;
 	private final static int MSG_PLAY_MUSIC = 2;
@@ -359,6 +383,12 @@ public class AndroidFishEatingFish extends Activity {
 		stopMusic();
 	}
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        recycleBitmaps();
+    }
+
 	private OnCompletionListener completionListener = new MediaPlayer.OnCompletionListener() {
 		@Override
 		public void onCompletion(MediaPlayer mp) {
@@ -370,6 +400,8 @@ public class AndroidFishEatingFish extends Activity {
 		if (!mPlayMusic) {
 			return;
 		}
+        if (mMPMusic != null)
+            mMPMusic.release();
 		mMPMusic = MediaPlayer.create(this, mSongs[mPlayList]);
 		mPlayList = (mPlayList + 1) % mSongs.length;
 		if (mMPMusic == null) {
@@ -385,6 +417,8 @@ public class AndroidFishEatingFish extends Activity {
 		}
 		if (mMPMusic != null) {
 			mMPMusic.stop();
+            mMPMusic.release();
+            mMPMusic = null;
 		}
 	}
 
