@@ -565,7 +565,8 @@ public class AndroidFishEatingFish extends Activity {
 
         @Override
         public Parcelable onSaveInstanceState() {
-            Bundle b = new Bundle(16);
+            Bundle b = new Bundle(17);
+            b.putParcelable("superState", super.onSaveInstanceState());
             b.putBundle("playerFish", playerFish.onSaveInstanceState());
             ArrayList<Parcelable> fishParcels =
                 new ArrayList<Parcelable>(computerFishs.size());
@@ -596,6 +597,9 @@ public class AndroidFishEatingFish extends Activity {
         @Override
         public void onRestoreInstanceState(Parcelable p) {
             Bundle b = (Bundle) p;
+
+            super.onRestoreInstanceState(b.getParcelable("superState"));
+
             playerFish = new Fish(b.getBundle("playerFish"));
 
             ArrayList<Parcelable> fishParcels = b.getParcelableArrayList("computerFishs");
