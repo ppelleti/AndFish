@@ -395,6 +395,14 @@ public class AndroidFishEatingFish extends Activity {
 			soundHandler.startMusic();
 		}
 	};
+
+    private OnCompletionListener soundCompletionListener =
+        new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.release();
+            }
+        };
  
 	private void startNextMusic() {
 		if (!mPlayMusic) {
@@ -405,8 +413,11 @@ public class AndroidFishEatingFish extends Activity {
 		mMPMusic = MediaPlayer.create(this, mSongs[mPlayList]);
 		mPlayList = (mPlayList + 1) % mSongs.length;
 		if (mMPMusic == null) {
+            showMsg("startNextMusic: MediaPlayer.create failed");
 			return;
 		}
+        showMsg("started new music player");
+        setErrorListener(mMPMusic, "music");
 		mMPMusic.setOnCompletionListener(completionListener);
 		mMPMusic.start();
 	}
@@ -429,8 +440,12 @@ public class AndroidFishEatingFish extends Activity {
 		}
 		MediaPlayer mp = MediaPlayer.create(this, resID);
 		if (mp != null) {
+            showMsg("started new sound player");
+            setErrorListener(mp, "sound");
 			mp.start();
-		}
+		} else {
+            showMsg("playSound: MediaPlayer.create failed");
+        }
 	}
 
 
@@ -706,6 +721,7 @@ public class AndroidFishEatingFish extends Activity {
         	mCount += 1;
         	if (mCount%500==0) {
         		mLevel += 1;
+                showMsg("now on level " + mLevel);
         	}
         	timeoutActiveGoodie();
         	boolean playerFishHasMoved = movePlayerFish();
@@ -1339,5 +1355,18 @@ public class AndroidFishEatingFish extends Activity {
         return null;
     }
 	
+    private void showMsg(String msg) {
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+    }
 
+    private void setErrorListener(MediaPlayer m, final String purpose) {
+        m.setOnErrorListener(new MediaPlayer.OnErrorListener () {
+                @Override
+                public boolean onError (MediaPlayer mp, int what, int extra) {
+                    showMsg(purpose + " MediaPlayer error: " +
+                            what + " " + extra);
+                    return true;
+                }
+            });
+    }
 }
