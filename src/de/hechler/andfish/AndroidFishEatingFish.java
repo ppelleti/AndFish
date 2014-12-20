@@ -442,6 +442,7 @@ public class AndroidFishEatingFish extends Activity {
 		if (mp != null) {
             showMsg("started new sound player");
             setErrorListener(mp, "sound");
+            mp.setOnCompletionListener(soundCompletionListener);
 			mp.start();
 		} else {
             showMsg("playSound: MediaPlayer.create failed");
